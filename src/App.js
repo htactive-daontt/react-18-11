@@ -1,86 +1,73 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+function Showlogin(props) {
+  return (
+    <>
+      <h1>{props.message}</h1>
+    </>
+  )
+}
 
-class App extends Component {
-  constructor() {
+
+export default class App extends React.Component {
+  constructor(props) {
     super();
     this.state = {
-      users: [],
-      userId: 0,
-      errors: []
-    }
+      showMessage : false,
+      email: "",
+      password: "",
+      users: [
+        {
+          email: "dao@gmail.com",
+          password: '1234'
+        },
+        {
+          email: 'dao1@gmai.com',
+          password: '1224'
+        },
+        {
+          email: 'dao2@gmail.com',
+          password: '12345'
+        }
+      ]
+    };
   }
-  componentDidMount() {
-    const axios = require('axios');
-    axios.get("http://localhost:3000/user")
-      .then(res => {
-        const users = res.data;
-        this.setState({
-          users
-        })
+  onHandleSubmit(e) {
+    e.preventDefault();
+    let Success = this.state.users.find(user =>
+      user.email === e.target[0].value && user.password === e.target[1].value)
+    if (Success) {
+      alert('Đăng Nhập Thành Công')
+      this.setState({
+        errors: "Xin chào bạn",
+        showMessage: true,
       })
-  }
-  handleInputEvent(event) {
-    event.preventDefault();
-    const { users } = this.state;
-    const email = event.target[0].value;
-    const password = event.target[1].value;
-    const errors = [];
-    let listUser = [...users];
-    switch (true) {
-      case (email.split("").length === 0):
-        errors.push("Empty Email")
-        this.setState({
-          errors: errors
-        })
-        break;
-      case (password.split("").length === 0):
-        errors.push("Empty Password")
-        this.setState({
-          errors: errors
-        })
-        break;
-      case (listUser.find((user) => user.email === email && user.password === password) !== undefined):
-        const userid = listUser.find((user) => user.email === email && user.password === password).id;
-        this.setState({
-          userId: userid,
-          errors: null
-        });
-        break;
-      case (listUser.find((user) => user.email === email) !== undefined && listUser.find((user) => user.password === password) === undefined):
-        errors.push("Wrong password")
-        this.setState({
-          errors: errors
-        });
-        break;
-      case (listUser.find((user) => user.email === email) === undefined):
-        errors.push("Wrong Email")
-        this.setState({
-          errors: errors
-        });
-        break;
-      default:
-        return;
+    } else {
+      alert('Đăng Nhập Thất Bại')
     }
   }
+
+
   render() {
-
+    const { showMessage, errors, users } = this.state
     return (
-      <form className="form-signin">
-        <h2 className="form-signin-heading"> Sign in </h2>
-        <label for="inputEmail" className="sr-only"> Email address
-                </label>
-        <input type="email" id="inputEmail" className="form-control" placeholder="Email address" required autofocus />
-
-
-        <label for="inputPassword" className="sr-only"> Password</label>
-        <input type="password" id="inputPassword" className="form-control" placeholder="Password" required />
-        <button className="btn btn-lg btn-primary btn-block" type="submit"> Sign in
-                </button>
-      </form>
-    );
+      <div className="App">
+        {showMessage ? <Showlogin message={errors} data={users} showMessage={showMessage} /> :
+          <form className="form-signin" onSubmit={(e) => this.onHandleSubmit(e)}>
+            {/* onSubmit={this.onHandleSubmit} */}
+            <h1>ĐĂNG NHẬP</h1>
+            <label htmlFor="email">Email</label>
+            <input name="email" type="text" placeholder="Enter your email" required />
+            <br></br>
+            <label htmlFor="email">Password</label>
+            <input name="password" type="password" placeholder="Enter your password" required />
+            <span style={{ color: 'red' }} >{this.state.errors}</span>
+            <br></br>
+            <button className="btn" type="submit">Login</button>
+          </form>
+        }
+      </div>
+    )
   }
 }
 
-export default App;
